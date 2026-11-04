@@ -1,0 +1,250 @@
+#!/bin/sh
+# pre-commit hook - git commit checker
+#
+# Fixed 2026-11-04 from an earlier version. What it does:
+#   1. Strips trailing spaces/tabs from staged text files and re-stages
+#      only the files that actually changed.
+#   2. Scans staged files for secrets and BLOCKS the commit if one is
+#      found. This is the point of the hook: no secrets are submitted
+#      to any repository.
+#   3. Does NOT validate JSON by default. That check was the thing
+#      blocking the author with "Invalid JSON: package.json", and its
+#      original version hid jq's real error (2>/dev/null), so nobody
+#      could tell whether package.json was bad, jq was missing, or
+#      something else failed. Set VALIDATE_JSON=1 to turn it back on;
+#      that version checks for jq first and prints jq's error.
+#
+# What was actually broken in the pasted version (verified, not guessed):
+#   - Secret regexes used grep -E with \{16\} style intervals. In
+#     extended regex, the interval is {16}, not \{16\}. The old
+#     patterns matched NOTHING, for all five secret types.
+#   - Even if a pattern had matched, the scanner did
+#     `echo ... | while read ...; do ... exit 1; done`. That while
+#     loop runs in a subshell because of the pipe, so exit 1 only
+#     killed the subshell. The hook then carried on and exited 0.
+#     The scanner could never block a commit. Both bugs are fixed
+#     here: correct ERE patterns, and the staged list is read from
+#     a file on fd 3 (no pipe), so a failure returns 1 from the
+#     function and the pipeline exits 1.
+#   - The whitespace fixer used `mv tmpfile file`, which replaces
+#     the file and can change its permissions. This version writes
+#     the cleaned content back into the same file, preserving mode.
+#   - The whitespace fixer also rewrote binary files line by line.
+#     This version skips binary files.
+#   - `git add` on a file inside an ignored directory (for example
+#     .vscode/launch.json, which was staged before .vscode/ was
+#     ignored) printed warnings and left the unstripped version
+#     staged. This version retries with git add -f, but only for a
+#     file that is already in the staged list, so it re-stages the
+#     same path instead of adding a new ignored file.
+#
+# Copilot's "Edge tab metadata / prompt bleed" theory is NOT in the
+# hook output the author pasted. That metadata block appeared in the
+# chat paste, not in the hook log. The log's real failure was
+# "Invalid JSON: package.json" with no metadata suffix. Do not
+# chase that theory again.
+#
+# Install: copy this file to .git/hooks/pre-commit and run
+#   chmod +x .git/hooks/pre-commit
+# This hook is per-clone, not committed: .git/hooks is not tracked
+# by git. For the Developers-Toolkit, ship a copy of this file in
+# the repo (for example hooks/pre-commit) plus install instructions,
+# and let each clone copy it into .git/hooks. Do not expect a file
+# placed in .git/hooks to travel with a push.
+#
+# POSIX sh only. No bashisms, no arrays, no process substitution.
+
+DEBUG=${DEBUG:-0}
+VALIDATE_JSON=${VALIDATE_JSON:-0}
+
+GIT_DIR=$(git rev-parse --git-dir 2>/dev/null || echo .git)
+LOG_DIR="$GIT_DIR/hooks/logs"
+LOG_FILE="$LOG_DIR/pre-commit.log"
+
+mkdir -p "$LOG_DIR" 2>/dev/null || true
+
+log() {
+    printf '%s\n' "$1" >> "$LOG_FILE" 2>/dev/null || true
+    printf '%s\n' "$1"
+}
+
+debug() {
+    if [ "$DEBUG" = "1" ]; then
+        printf '[DEBUG] %s\n' "$1" >> "$LOG_FILE" 2>/dev/null || true
+        printf '[DEBUG] %s\n' "$1"
+    fi
+}
+
+log "[pre-commit] starting hook..."
+
+# Staged list, written once to a file inside .git (never staged).
+# Read it on fd 3 so the loops run in the current shell: failures
+# and return codes are real, and filenames with spaces survive
+# (read -r reads a whole line, and $FILES is never word-split).
+STAGED_LIST="$LOG_DIR/staged-files.txt"
+trap 'rm -f "$STAGED_LIST"' EXIT INT TERM
+if ! git diff --cached --name-only --no-renames --diff-filter=ACM > "$STAGED_LIST" 2>/dev/null; then
+    log "ERROR: could not list staged files (not in a git repo?)"
+    exit 1
+fi
+
+log "[pre-commit] Staged files:"
+while IFS= read -r f <&3 || [ -n "$f" ]; do
+    log " - $f"
+done 3< "$STAGED_LIST"
+
+is_real_file() {
+    [ -f "$1" ]
+}
+
+###############################################################################
+# WHITESPACE FIXER
+###############################################################################
+
+fix_whitespace() {
+    log "[pre-commit] Fixing whitespace..."
+
+    while IFS= read -r file <&3 || [ -n "$file" ]; do
+        if [ -z "$file" ]; then
+            continue
+        fi
+        if ! is_real_file "$file"; then
+            debug "Skipping non-existent file: $file"
+            continue
+        fi
+        # grep -I ignores binary files: a binary file returns no
+        # match here and is skipped, instead of being rewritten.
+        if ! grep -Iq '' "$file" 2>/dev/null; then
+            debug "Skipping binary or empty file: $file"
+            continue
+        fi
+
+        debug "Processing: $file"
+        tmpfile="$file.tmp.$$"
+        (
+            while IFS= read -r line || [ -n "$line" ]; do
+                stripped=$(printf '%s' "$line" | sed 's/[[:blank:]]*$//')
+                printf '%s\n' "$stripped"
+            done < "$file"
+        ) > "$tmpfile"
+
+        if cmp -s "$tmpfile" "$file"; then
+            rm -f "$tmpfile"
+            continue
+        fi
+        # Write back into the same file, preserving its permissions,
+        # instead of mv, which would replace the file and its mode.
+        cat "$tmpfile" > "$file"
+        rm -f "$tmpfile"
+        # Re-stage the same path. The normal add works for most
+        # files; the -f fallback covers a staged file inside an
+        # ignored directory (for example .vscode/), where plain
+        # git add refuses and would leave the unstripped version
+        # staged. This only ever re-stages a path that was already
+        # in the staged list, so it does not add new ignored files.
+        git add -- "$file" 2>/dev/null || git add -f -- "$file" 2>/dev/null || log "WARNING: git add failed for $file"
+    done 3< "$STAGED_LIST"
+    return 0
+}
+
+###############################################################################
+# SECRET SCANNER - this is the commit checker
+# Patterns are the original five, corrected to ERE: {16}, not \{16\}.
+# This is not a comprehensive secret scanner. It checks exactly these
+# five patterns. Do not claim wider coverage than that.
+###############################################################################
+
+scan_secrets() {
+    log "[pre-commit] Scanning for secrets..."
+    failed=0
+
+    while IFS= read -r file <&3 || [ -n "$file" ]; do
+        if [ -z "$file" ]; then
+            continue
+        fi
+        if ! is_real_file "$file"; then
+            continue
+        fi
+        while IFS= read -r regex; do
+            [ -z "$regex" ] && continue
+            if grep -E -a -q -- "$regex" "$file" 2>/dev/null; then
+                log "Secret detected in $file"
+                log "Pattern: $regex"
+                failed=1
+            fi
+        done <<'PATTERNS'
+AKIA[0-9A-Z]{16}
+ASIA[0-9A-Z]{16}
+AIza[0-9A-Za-z_-]{35}
+sk_live_[0-9A-Za-z]{24}
+sk_test_[0-9A-Za-z]{24}
+PATTERNS
+    done 3< "$STAGED_LIST"
+
+    return "$failed"
+}
+
+###############################################################################
+# JSON VALIDATION - OFF BY DEFAULT
+# "do not validate my json at all" until he asks for it back.
+# Turn it on with: VALIDATE_JSON=1 git commit
+# When on, it first checks jq exists (the old version failed every
+# JSON file as "invalid" if jq was missing, with the real error
+# hidden by 2>/dev/null), and it prints jq's error instead of hiding it.
+###############################################################################
+
+validate_json() {
+    if [ "$VALIDATE_JSON" != "1" ]; then
+        debug "JSON validation skipped (VALIDATE_JSON is not 1)"
+        return 0
+    fi
+    if ! command -v jq >/dev/null 2>&1; then
+        log "WARNING: VALIDATE_JSON=1 but jq is not installed - skipping JSON validation, not failing the commit"
+        return 0
+    fi
+
+    log "[pre-commit] Validating JSON..."
+    while IFS= read -r file <&3 || [ -n "$file" ]; do
+        case "$file" in
+            *.json) ;;
+            *) continue ;;
+        esac
+        base=${file##*/}
+        case "$base" in
+            tsconfig.json|package-lock.json) continue ;;
+        esac
+        case "$file" in
+            *.jsonc) continue ;;
+            .vscode/launch.json|.vscode/tasks.json) continue ;;
+            */.vscode/launch.json|*/.vscode/tasks.json) continue ;;
+        esac
+        if ! jq empty "$file" > "$LOG_DIR/jq-error.txt" 2>&1; then
+            log "Invalid JSON: $file"
+            if [ -s "$LOG_DIR/jq-error.txt" ]; then
+                log "jq error:"
+                while IFS= read -r errline; do
+                    log "  $errline"
+                done < "$LOG_DIR/jq-error.txt"
+            fi
+            rm -f "$LOG_DIR/jq-error.txt"
+            return 1
+        fi
+        rm -f "$LOG_DIR/jq-error.txt"
+    done 3< "$STAGED_LIST"
+    return 0
+}
+
+###############################################################################
+# EXECUTION PIPELINE - no JSON validation unless opted in
+###############################################################################
+
+fix_whitespace || exit 1
+scan_secrets || exit 1
+validate_json || exit 1
+
+###############################################################################
+# SUCCESS
+###############################################################################
+
+log "[pre-commit] All checks passed."
+exit 0

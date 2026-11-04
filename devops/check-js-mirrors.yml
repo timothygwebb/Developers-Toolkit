@@ -1,0 +1,59 @@
+# check-js-mirrors.yml
+# Place at: .github/workflows/check-js-mirrors.yml in your repo
+#
+# Why this exists (2026-10-19): the compiled backend .js files are committed
+# next to their .ts sources, and the pair drifted — the .ts source for
+# operations.routes served real logStore entries while the stale committed
+# .js shipped a hardcoded `generatedRepositoryWorklogs` array with fabricated
+# entries. This check fails a PR whenever the
+# committed .js mirrors don't match what the .ts sources compile to, so the
+# fakes can never ship again.
+
+name: check-js-mirrors
+
+on:
+  pull_request:
+    paths:
+      - 'backend/src/**/*.ts'
+      - 'backend/src/**/*.js'
+      - 'backend/package.json'
+      - 'backend/package-lock.json'
+      - 'backend/tsconfig*.json'
+  push:
+    branches: [master, main]
+    paths:
+      - 'backend/src/**/*.ts'
+      - 'backend/src/**/*.js'
+
+jobs:
+  mirrors-in-sync:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # CONFIRM: match the Node version you run locally before merging.
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - run: npm ci
+
+      # Verified 2026-10-19 against backend/tsconfig.json (no noEmit, no outDir)
+      # and backend/package.json (no build script): plain tsc emits the .js
+      # mirrors in place next to the .ts sources, which is what this checks.
+      - run: npx tsc
+
+      - name: Fail if any committed .js mirror is stale
+        run: |
+          STALE=$(git status --porcelain -- 'src/**/*.js')
+          if [ -n "$STALE" ]; then
+            echo "::error::Committed .js mirrors are stale - recompile and commit them:"
+            echo "$STALE"
+            exit 1
+          fi
+          echo "All committed .js mirrors match their .ts sources."
