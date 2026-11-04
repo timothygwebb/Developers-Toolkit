@@ -51,14 +51,6 @@ files are pure ASCII, so they run cleanly under Windows PowerShell 5.1.
   [automation/SETUP.md](automation/SETUP.md)); that file is never committed.
 - No hardcoded machine paths. Repo locations are parameters or
   `$env:USERPROFILE` defaults — nothing here points at a specific machine.
-- No unpublished drafts, personal documents, private-project source, or
-  binary art. The exclusion list in CATALOG.md names each one.
-- No AI-platform work. Scripts, docs, and plans for AI-platform projects
-  — including any documentation of what is shipped or planned — are withheld
-  entirely.
-- No private game scripts. Patch and diagnostic scripts for a private
-  isometric game are withheld, not reworded, under the author's
-  no-potential-violation rule for public posts.
 
 ## Requirements
 

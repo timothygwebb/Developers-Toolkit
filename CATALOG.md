@@ -1,7 +1,6 @@
 # Catalog
 
-Every file in this toolkit, with a one-line description, and every file
-left out, with the reason. Each entry is a problem-resolution tool, not a
+Every file in this toolkit, with a one-line description. Each entry is a problem-resolution tool, not a
 product component. Staged 2026-10-30.
 
 ## Included files
@@ -60,28 +59,3 @@ product component. Staged 2026-10-30.
 
 - `devops/Extract-ResumeText.py` extracts resume text from a PDF you point it at. The `docs/` guides are templates — replace placeholders with your own site and voice.
 
-## Excluded files (from the source folders) and reasons
-
-- Game patch and diagnostic scripts for a private isometric game (112 files, plus a smoke workflow and a sandbox diagnostic for the same game) — withheld under the author's no-potential-violation rule for public posts (2026-11-04): the scripts handle third-party retail scenario formats, so they are not published here, and they are not reworded to another project name, because rewording would leave that handling in place.
-
-- `365ITGuard-hash-mismatch-report.txt` — Beta-test report, not tooling; machine-specific.
-- Personal email-rules document with account details — withheld.
-- Personal family note — withheld.
-- Superseded build script — Superseded by the pick-loop design; do not run.
-- AI-platform scripts, installers, probe/design docs, plan docs, and source fragments — withheld: AI-platform work, including any documentation of what is shipped or planned, is not published publicly.
-- `agent-platform/` (51 AI-platform scripts) and the AI-platform smoke-test workflow — withheld under the same rule.
-- `Invoke-BetaInstall-365ITGuard.ps1` — Harness for a closed third-party beta; downloads/runs a third-party installer with a hash-mismatch history. Not reusable public tooling.
-- `cli-sync-real.py` — Real-Atlassian sync design. Superseded by the mock design.
-- `cli-with-real-sync.py` — Real-Atlassian sync design, plus a proprietary / All Rights Reserved header.
-- `cli-with-mock-sync.py` — Correct mock design, but the header marks it proprietary / All Rights Reserved. Needs a license decision before any public release.
-- `time_tracker.py` — Same proprietary / All Rights Reserved header. Needs a license decision before any public release.
-- `proactive_messages/ (81 files)` — Agent working state, not tooling.
-- `__pycache__/ (7 files)` — Compiled Python bytecode.
-- `king-art/` — Binary PNG art.
-- Personal resume documents — withheld.
-- Private game source files — Source of the private game (intended for commercial sale).
-- `tsx-help-assistant-fill-popout/` — Empty directory; nothing to ship.
-- `blog-automation/.wp_token` — Live WordPress.com OAuth token. Never shipped.
-- `blog-automation/state.json` — Run state (post IDs/URLs).
-- `blog-automation/queue/, posted/` — Article drafts; unpublished drafts stay private.
-- `blog-automation/config.json` — Replaced by automation/config.example.json (site name replaced with an example site in the example).

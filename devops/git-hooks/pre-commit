@@ -185,7 +185,7 @@ PATTERNS
 }
 
 ###############################################################################
-# JSON VALIDATION - OFF BY DEFAULT, per the author's instruction
+# JSON VALIDATION - OFF BY DEFAULT
 # "do not validate my json at all" until he asks for it back.
 # Turn it on with: VALIDATE_JSON=1 git commit
 # When on, it first checks jq exists (the old version failed every

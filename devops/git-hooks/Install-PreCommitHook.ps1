@@ -47,8 +47,8 @@
     The script aborts before writing anything if the source is
     missing, empty, or does not start with "#!/bin/sh".
 
-    Defaults (staged public copy; the author's local copy uses
-    his own repo as the default instead):
+    Defaults (staged public copy; a local copy may use a
+    different repo as the default instead):
       RepoRoot:        the current directory. Run this script
                        from the repo checkout you want to protect,
                        or pass -RepoRoot explicitly.
