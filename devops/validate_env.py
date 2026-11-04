@@ -1,4 +1,4 @@
-"""Validate JobApplicationEngine .env without exposing secret values."""
+"""Validate a project .env without exposing secret values."""
 import re
 from pathlib import Path
 

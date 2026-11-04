@@ -5,14 +5,14 @@ import shutil
 # Configuration
 # Set these via environment variables or update the defaults below before running.
 CERTBOT_PATH = os.environ.get("CERTBOT_PATH", r"C:\path\to\certbot")
-PROJECT_CERT_DIR = os.environ.get("PROJECT_CERT_DIR", r"C:\path\to\roku-voice-assistant\mobile_app")
+PROJECT_CERT_DIR = os.environ.get("PROJECT_CERT_DIR", r"C:\path\to\example-project\mobile_app")
 DOMAIN = os.environ.get("CERTBOT_DOMAIN", "yourdomain.com")  # Replace with your actual domain name
 CERTBOT_LIVE_DIR = rf"C:\Certbot\live\{DOMAIN}"
 CERTBOT_EXE = os.path.join(CERTBOT_PATH, "certbot.exe")
 
 _PLACEHOLDER_PATHS = {
     "CERTBOT_PATH": (CERTBOT_PATH, r"C:\path\to\certbot"),
-    "PROJECT_CERT_DIR": (PROJECT_CERT_DIR, r"C:\path\to\roku-voice-assistant\mobile_app"),
+    "PROJECT_CERT_DIR": (PROJECT_CERT_DIR, r"C:\path\to\example-project\mobile_app"),
     "CERTBOT_DOMAIN": (DOMAIN, "yourdomain.com"),
 }
 

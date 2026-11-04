@@ -154,7 +154,7 @@ if (-not $back) {
                     } elseif ($postReset -lt 15) {
                         $finalVerdict = "RESET WORKED - post-reset average $postReset%. A fresh re-index of a ~584 GB namespace can run warm for a while; re-run Check-OneDriveAndRam.ps1 later today - settled under 5% means done."
                     } else {
-                        $finalVerdict = "STILL PEGGED after /reset (average $postReset%). The service is stuck on the namespace itself. Durable fix: selective sync - OneDrive Settings > Account > Choose folders, and untick the big ones this machine does not need locally (Webb Hosting Services Backups 144 GB, Apps 118 GB, Imports 45 GB) - then re-sample."
+                        $finalVerdict = "STILL PEGGED after /reset (average $postReset%). The service is stuck on the namespace itself. Durable fix: selective sync - OneDrive Settings > Account > Choose folders, and untick the big ones this machine does not need locally (your largest folders - example: Backups, Apps, Imports) - then re-sample."
                     }
                 } else {
                     $finalVerdict = 'INCONCLUSIVE - after /reset the sync service did not return within 3 minutes. Open the OneDrive app, confirm it says it is starting/syncing, then re-run Check-OneDriveAndRam.ps1.'
@@ -174,10 +174,10 @@ if (-not $back) {
 }
 Write-Output ''
 try {
-    $h = Invoke-RestMethod -Uri 'http://127.0.0.1:8002/api/speedup/health' -TimeoutSec 5
-    Write-Output ("SpeedUp now: cpu={0} ram={1} disk={2} score={3}" -f $h.cpu, $h.ram, $h.disk, $h.score)
+    $h = Invoke-RestMethod -Uri 'http://127.0.0.1:8002/api/health' -TimeoutSec 5
+    Write-Output ("LocalHealth now: cpu={0} ram={1} disk={2} score={3}" -f $h.cpu, $h.ram, $h.disk, $h.score)
 } catch {
-    Write-Output 'SpeedUp: still not answering on :8002 (stack/backend down - separate thread).'
+    Write-Output 'LocalHealth: still not answering on :8002 (stack/backend down - separate thread).'
 }
 Write-Output ''
-Write-Output 'Done. Paste this whole output back to Everest.'
+Write-Output 'Done. Done.'

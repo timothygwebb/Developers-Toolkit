@@ -5,7 +5,7 @@
 # next to their .ts sources, and the pair drifted — the .ts source for
 # operations.routes served real logStore entries while the stale committed
 # .js shipped a hardcoded `generatedRepositoryWorklogs` array with fabricated
-# entries attributed to Timothy by name. This check fails a PR whenever the
+# entries. This check fails a PR whenever the
 # committed .js mirrors don't match what the .ts sources compile to, so the
 # fakes can never ship again.
 

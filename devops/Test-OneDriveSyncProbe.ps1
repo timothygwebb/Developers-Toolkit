@@ -75,9 +75,9 @@ Write-Output "Sync service running at start: $svcUp"
 Write-Output ''
 
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
-$probeName = "everest-sync-probe-$stamp.txt"
+$probeName = "sync-probe-$stamp.txt"
 $probePath = Join-Path $root $probeName
-"Everest sync probe. Created $stamp. Safe to delete." | Set-Content -LiteralPath $probePath -Encoding ASCII
+"Sync probe. Created $stamp. Safe to delete." | Set-Content -LiteralPath $probePath -Encoding ASCII
 Write-Output "Probe file dropped: $probePath"
 $item = Get-Item -LiteralPath $probePath -Force -ErrorAction SilentlyContinue
 if ($item) { Write-Output ("  attributes at drop: {0}" -f $item.Attributes) }
@@ -111,7 +111,7 @@ if ($woke) {
     if ($null -eq $avg) {
         $verdict = 'INCONCLUSIVE - the service woke, then stopped during sampling. Start/stop cycling is itself a symptom worth noting; re-run Check-OneDriveAndRam.ps1 in a few minutes.'
     } elseif ($avg -ge 15) {
-        $verdict = "RE-PEGGED ON WAKE - average $avg%. Waking the service brings the burn back, so the restart cure did not hold. Durable fix: selective sync (OneDrive Settings > Account > Choose folders) - untick Webb Hosting Services Backups (144 GB), Apps (118 GB), Imports (45 GB) on this machine - then re-run this probe."
+        $verdict = "RE-PEGGED ON WAKE - average $avg%. Waking the service brings the burn back, so the restart cure did not hold. Durable fix: selective sync (OneDrive Settings > Account > Choose folders) - untick your largest folders (example: Backups, Apps, Imports) on this machine - then re-run this probe."
     } elseif ($avg -lt 5) {
         $verdict = "SYNC PATH ALIVE, SERVICE BEHAVES - average $avg% with a fresh change to process. The dormant service was simply demand-started and idle-healthy, exactly what we want. OneDrive is fixed; nothing further to do unless it re-pegs days from now."
     } else {
@@ -132,10 +132,10 @@ if (Test-Path -LiteralPath $probePath) {
 }
 Write-Output ''
 try {
-    $h = Invoke-RestMethod -Uri 'http://127.0.0.1:8002/api/speedup/health' -TimeoutSec 5
-    Write-Output ("SpeedUp now: cpu={0} ram={1} disk={2} score={3}" -f $h.cpu, $h.ram, $h.disk, $h.score)
+    $h = Invoke-RestMethod -Uri 'http://127.0.0.1:8002/api/health' -TimeoutSec 5
+    Write-Output ("LocalHealth now: cpu={0} ram={1} disk={2} score={3}" -f $h.cpu, $h.ram, $h.disk, $h.score)
 } catch {
-    Write-Output 'SpeedUp: still not answering on :8002 (stack/backend down - separate thread).'
+    Write-Output 'LocalHealth: still not answering on :8002 (stack/backend down - separate thread).'
 }
 Write-Output ''
-Write-Output 'Done. Paste this whole output back to Everest.'
+Write-Output 'Done. Done.'

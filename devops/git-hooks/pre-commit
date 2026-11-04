@@ -1,14 +1,14 @@
 #!/bin/sh
 # pre-commit hook - git commit checker
 #
-# Fixed 2026-11-04 from the version Timothy pasted. What it does:
+# Fixed 2026-11-04 from an earlier version. What it does:
 #   1. Strips trailing spaces/tabs from staged text files and re-stages
 #      only the files that actually changed.
 #   2. Scans staged files for secrets and BLOCKS the commit if one is
 #      found. This is the point of the hook: no secrets are submitted
 #      to any repository.
 #   3. Does NOT validate JSON by default. That check was the thing
-#      blocking Timothy with "Invalid JSON: package.json", and its
+#      blocking the author with "Invalid JSON: package.json", and its
 #      original version hid jq's real error (2>/dev/null), so nobody
 #      could tell whether package.json was bad, jq was missing, or
 #      something else failed. Set VALIDATE_JSON=1 to turn it back on;
@@ -39,7 +39,7 @@
 #     same path instead of adding a new ignored file.
 #
 # Copilot's "Edge tab metadata / prompt bleed" theory is NOT in the
-# hook output Timothy pasted. That metadata block appeared in the
+# hook output the author pasted. That metadata block appeared in the
 # chat paste, not in the hook log. The log's real failure was
 # "Invalid JSON: package.json" with no metadata suffix. Do not
 # chase that theory again.
@@ -185,7 +185,7 @@ PATTERNS
 }
 
 ###############################################################################
-# JSON VALIDATION - OFF BY DEFAULT, per Timothy's instruction
+# JSON VALIDATION - OFF BY DEFAULT, per the author's instruction
 # "do not validate my json at all" until he asks for it back.
 # Turn it on with: VALIDATE_JSON=1 git commit
 # When on, it first checks jq exists (the old version failed every

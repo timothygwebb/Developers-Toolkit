@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Post the next queued article to theworldin.wordpress.com via the WordPress.com REST API.
+"""Post the next queued article to a WordPress.com site configured in config.json via the WordPress.com REST API.
+
+Example: post a series of articles to any domain. Set "site" in config.json
+to any domain you own — example: your-site.wordpress.com — queue articles
+in queue/NN-*.md, and run this script once a day. The domain is a variable
+in config.json, not hard-coded in this script, so anyone can pick it up
+and use it for its intended use without editing it first.
 
 Usage:
   python3 post_article.py            # post next queued article

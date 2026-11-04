@@ -1,22 +1,24 @@
 # Developer Toolkit
 
+34 problem-resolution tools. MIT licensed.
+
 This is not a product, and it is not a delivery of one. It is a toolkit:
 scripts, utilities, and documentation for resolving problems in products
-I developed — diagnose the problem, apply the fix, verify the result.
-Everything here is a tool I actually used to fix something real.
+developed products — diagnose the problem, apply the fix, verify the result.
+Everything here is a tool used to fix a real problem.
 
-The automation tools run daily here: https://theworldin.wordpress.com
+The automation tools post one queued article per day to a WordPress.com site you configure (see automation/SETUP.md). Example site: your-site.wordpress.com.
 
 ## Tools by problem area
 
-- **`automation/` — Build & publish automation.** A daily WordPress.com
+- **`automation/` (5 files) — Build & publish automation.** A daily WordPress.com
   poster: one queued article a day, saved as a draft for review, via the
   WordPress.com REST API. Includes the setup guide and an example config.
   Fully standalone — needs only Python 3 and a WordPress.com OAuth token.
   Also here: a universal Swagger/OpenAPI JSON to diagram converter
-  (with a sample API) — it emits Mermaid, PlantUML, or XMI, so an API
-  diagrams in free tools with no paid modeling product required.
-- **`devops/` — Version control, CI/CD & machine diagnostics.** GitHub
+  (with a sample API) — it emits Mermaid, PlantUML, or XMI, so you can diagram an API
+  in free tools with no paid modeling product required.
+- **`devops/` (23 files) — Version control, CI/CD & machine diagnostics.** GitHub
   Actions smoke-test workflows, merged-branch cleanup, OneDrive/machine
   diagnostics, environment validators, a base64-corruption detector,
   IIS and Certbot deployment setup, a login-page diagnostic, credential
@@ -24,7 +26,7 @@ The automation tools run daily here: https://theworldin.wordpress.com
   `devops/git-hooks/`: a pre-commit hook that blocks secrets from
   being committed in the first place, plus installers for one repo,
   for every repo, and for future clones via a git template.
-- **`docs/` — Documentation.** The writing style guide and topic calendar
+- **`docs/` (3 files) — Documentation.** The writing style guide and topic calendar
   behind the daily blog series, as reusable templates, plus rate-limit
   and automation-robustness patterns.
 
@@ -48,17 +50,21 @@ files are pure ASCII, so they run cleanly under Windows PowerShell 5.1.
   token from a local `.wp_token` file you create yourself (see
   [automation/SETUP.md](automation/SETUP.md)); that file is never committed.
 - No hardcoded machine paths. Repo locations are parameters or
-  `$env:USERPROFILE` defaults — nothing here points at my machine.
+  `$env:USERPROFILE` defaults — nothing here points at a specific machine.
 - No unpublished drafts, personal documents, private-project source, or
   binary art. The exclusion list in CATALOG.md names each one.
-- No AI-platform work. Scripts, docs, and plans for the owner's AI projects
+- No AI-platform work. Scripts, docs, and plans for AI-platform projects
   — including any documentation of what is shipped or planned — are withheld
   entirely.
+- No private game scripts. Patch and diagnostic scripts for a private
+  isometric game are withheld, not reworded, under the author's
+  no-potential-violation rule for public posts.
 
 ## Requirements
 
 - Windows PowerShell 5.1 for the `.ps1` scripts (pure ASCII, no BOM issues).
 - Python 3.8+ for the `.py` utilities and the WordPress poster.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).

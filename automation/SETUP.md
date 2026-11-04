@@ -2,8 +2,31 @@
 
 Posts one queued article per day to a WordPress.com site via the public
 REST API, saved as a **draft** for your review. You publish manually.
-This is the exact system behind the daily series at
-https://theworldin.wordpress.com.
+Use it like this: configure a WordPress.com site in config.json, queue articles, and run the poster once a day. Example site: your-site.wordpress.com.
+
+## Example: post a series of articles to any domain
+
+Here is how you can post to any domain a series of articles. No code
+changes are needed — the domain is a variable, not hard-coded.
+
+1. Copy `config.example.json` to `config.json` and set `site` to any
+   domain you own. Example:
+   ```json
+   {"site": "your-site.wordpress.com", "status": "draft"}
+   ```
+   In other words: `site` is the variable. Replace the example domain
+   with your own domain, and the poster posts to that domain.
+2. Put a series in `queue/`, one file per article, in order:
+   `01-first-article.md`, `02-second-article.md`, `03-third-article.md`.
+   Each file starts with `TITLE: <title>`, a blank line, then HTML.
+3. Dry-run first, then run once a day:
+   ```sh
+   python3 post_article.py --dry-run
+   python3 post_article.py
+   ```
+   Each run posts the lowest-numbered queued article, moves it to
+   `posted/`, and records it in `state.json`, so a series posts one
+   article per run, in order, to the domain in `config.json`.
 
 ## Files
 

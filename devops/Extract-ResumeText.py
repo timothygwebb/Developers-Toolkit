@@ -1,9 +1,9 @@
 """Extract resume text from a PDF using the repo's own pypdf dependency.
 
-Replaces the `pdftotext` step in docs/REMOTE_CAMPAIGN.md. Extracts directly
+Replaces a `pdftotext` step. Extracts directly
 from the PDF you point it at, so the source-text hash still means something.
 
-Usage (run from your JobApplicationEngine clone):
+Usage (run from your project clone):
     python Extract-ResumeText.py "C:\\path\\to\\resume.pdf"
 
 Writes .application-private\\source-resume.txt next to the repo.

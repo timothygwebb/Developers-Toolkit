@@ -6,18 +6,18 @@
 #     in the last hour (churn), and checks whether source / Downloads /
 #     Documents live INSIDE a OneDrive root.
 #  2) RAM by APP (all PIDs summed per app, not per process).
-#  3) SpeedUp health at the start and end of the sample window.
+#  3) Local health at the start and end of the sample window.
 # Report-only: deletes nothing, changes nothing.
 # Windows PowerShell 5.1, pure ASCII.
 
 $ErrorActionPreference = 'Continue'
 
-function Show-SpeedUpHealth([string]$Label) {
+function Show-LocalHealth([string]$Label) {
     try {
-        $h = Invoke-RestMethod -Uri 'http://127.0.0.1:8002/api/speedup/health' -TimeoutSec 5
-        Write-Output ("SpeedUp ($Label): cpu={0} ram={1} disk={2} score={3}" -f $h.cpu, $h.ram, $h.disk, $h.score)
+        $h = Invoke-RestMethod -Uri 'http://127.0.0.1:8002/api/health' -TimeoutSec 5
+        Write-Output ("Local health ($Label): cpu={0} ram={1} disk={2} score={3}" -f $h.cpu, $h.ram, $h.disk, $h.score)
     } catch {
-        Write-Output "SpeedUp ($Label): not answering on :8002"
+        Write-Output "Local health ($Label): not answering on :8002"
     }
 }
 
@@ -25,7 +25,7 @@ Write-Output '=================================================='
 Write-Output ' ONEDRIVE + RAM FOLLOW-UP'
 Write-Output '=================================================='
 Write-Output ''
-Show-SpeedUpHealth 'window start'
+Show-LocalHealth 'window start'
 Write-Output ''
 
 # ---------------- OneDrive sync roots ----------------
@@ -144,6 +144,6 @@ Get-Process -ErrorAction SilentlyContinue |
     Select-Object -First 15 |
     ForEach-Object { Write-Output ("  {0,-28} {1,6} PIDs  {2,8} MB" -f $_.App, $_.PIDs, $_.MB) }
 Write-Output ''
-Show-SpeedUpHealth 'window end'
+Show-LocalHealth 'window end'
 Write-Output ''
-Write-Output 'Done. Paste this whole output back to Everest.'
+Write-Output 'Done. Done.'

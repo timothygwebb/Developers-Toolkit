@@ -1,8 +1,8 @@
 <#
 .SYNOPSIS
-  Deletes merged remote branches across the author's repos. Every branch in the
-  embedded lists had its pull request merged (verified against the GitHub API
-  2026-10-17); master/main are never touched.
+  Deletes merged remote branches across your repos. Use this tool like this:
+  edit the example $repos list below for your own repos, or drive it with
+  parameters - no repo or branch list is hard-coded to a specific project.
 
 .DESCRIPTION
   For each repo checkout: fetches and prunes, shows the full delete plan,
@@ -10,14 +10,19 @@
   `git push origin --delete` per branch and a safe local `git branch -d`
   (which refuses unmerged branches on its own).
 
+  Only delete branches whose pull requests you have verified merged.
+  master/main are never touched.
+
 .EXAMPLE
   .\Remove-MergedGitBranches.ps1
 .EXAMPLE
-  .\Remove-MergedGitBranches.ps1 -JaePath "$env:USERPROFILE\source\repos\JobApplicationEngine" -Force
+  .\Remove-MergedGitBranches.ps1 -RepoPath "$env:USERPROFILE\source\repos\example-repo" -Branches "example-branch-1","example-branch-2" -Force
 #>
 [CmdletBinding()]
 param(
-  [string]$JaePath = "",
+  [Alias('JaePath')]
+  [string]$RepoPath = "",
+  [string[]]$Branches = @(),
   [switch]$Force
 )
 
@@ -27,34 +32,37 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
   exit 1
 }
 
+# Example driver list. Replace Name, Path, and Branches with your own repos
+# and merged branches, or pass -RepoPath and -Branches instead (see below).
 $repos = @(
   @{
-    Name = "JobApplicationEngine"
-    Path = $JaePath
+    Name = "example-repo"
+    Path = $RepoPath
     Branches = @(
-      "fix/campaign-prepare-field-validation", "feat/remote-application-campaign",
-      "fix/no-hardcoded-chrome-profile", "feat/persistent-browser-profile",
+      "example-branch-1", "example-branch-2",
       "dependabot/github_actions/actions/setup-python-7",
       "dependabot/github_actions/actions/cache-6",
-      "dependabot/github_actions/actions/checkout-7",
-      "fix-greenhouse-location-autocomplete", "chore/update-gitignore",
-      "fix-indeed-auth-wall", "fix-new-status-eligible",
-      "docs/comprehensive-update", "fix-location-autocomplete-keyboard",
-      "fix-greenhouse-live-test-bugs", "test-auto-apply-dryrun",
-      "test-auto-apply-safety", "ats-adapters-apply",
-      "copilot/fix-code-comments-review", "copilot/update-gmail-statuses",
-      "copilot/vscode-ms9xm7ay-80ne", "copilot/enhance-job-application-automation",
-      "timothygwebb-patch-2", "timothygwebb-patch-1",
-      "copilot/fix-16106877-1303598415-c2432a4c-3948-406d-8294-354a7ec8f0a0"
+      "dependabot/github_actions/actions/checkout-7"
     )
   }
 )
+
+# Parameter-driven mode: -RepoPath + -Branches overrides the example list.
+if ($Branches.Count -gt 0 -and -not [string]::IsNullOrWhiteSpace($RepoPath)) {
+  $repos = @(
+    @{
+      Name = "example-repo"
+      Path = $RepoPath
+      Branches = $Branches
+    }
+  )
+}
 
 # ---------------- plan ----------------
 $plan = @()
 foreach ($r in $repos) {
   if ([string]::IsNullOrWhiteSpace($r.Path)) {
-    Write-Host "Skipping $($r.Name): no checkout path given (pass -JaePath etc.)." -ForegroundColor Yellow
+    Write-Host "Skipping $($r.Name): no checkout path given (pass -RepoPath)." -ForegroundColor Yellow
     continue
   }
   if (-not (Test-Path (Join-Path $r.Path ".git"))) {

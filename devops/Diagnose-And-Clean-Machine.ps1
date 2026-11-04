@@ -1,9 +1,9 @@
 # Diagnose-And-Clean-Machine.ps1
-# 1) Shows what SpeedUp sees (cpu / ram / disk / score) before cleanup
+# 1) Shows what LocalHealth sees (cpu / ram / disk / score) before cleanup
 # 2) Reports the biggest disk consumers and the top CPU / RAM processes
 # 3) Frees SAFE junk only: temp files older than 24h, the Recycle Bin,
 #    and the Windows Update download cache
-# 4) Re-reads free space + SpeedUp score so the gain is visible
+# 4) Re-reads free space + LocalHealth score so the gain is visible
 # Nothing outside those junk paths is deleted. No admin required;
 # admin-only items are attempted and reported if they could not clear.
 # Windows PowerShell 5.1, pure ASCII.
@@ -24,13 +24,13 @@ function Get-DirGB([string]$Path) {
     return [math]::Round($sum / 1GB, 2)
 }
 
-function Show-SpeedUpHealth([string]$Label) {
-    Write-Output "--- SpeedUp health ($Label) ---"
+function Show-LocalHealth([string]$Label) {
+    Write-Output "--- Local health ($Label) ---"
     try {
-        $h = Invoke-RestMethod -Uri 'http://127.0.0.1:8002/api/speedup/health' -TimeoutSec 5
+        $h = Invoke-RestMethod -Uri 'http://127.0.0.1:8002/api/health' -TimeoutSec 5
         $h | ConvertTo-Json -Depth 4
     } catch {
-        Write-Output "  (SpeedUp backend not answering on :8002 - start the stack to see the score)"
+        Write-Output "  (LocalHealth backend not answering on :8002 - start the stack to see the score)"
     }
     Write-Output ''
 }
@@ -40,7 +40,7 @@ Write-Output ' MACHINE LOAD DIAGNOSIS + SAFE CLEANUP'
 Write-Output '=================================================='
 Write-Output ''
 
-Show-SpeedUpHealth 'BEFORE'
+Show-LocalHealth 'BEFORE'
 
 $freeBefore = Get-FreeGB 'C'
 Write-Output "C: free space BEFORE: $freeBefore GB"
@@ -171,5 +171,5 @@ $freeAfter = Get-FreeGB 'C'
 $freed = [math]::Round($freeAfter - $freeBefore, 2)
 Write-Output "C: free space AFTER: $freeAfter GB  (freed $freed GB)"
 Write-Output ''
-Show-SpeedUpHealth 'AFTER'
-Write-Output 'Done. Paste this whole output back to Everest.'
+Show-LocalHealth 'AFTER'
+Write-Output 'Done. Done.'

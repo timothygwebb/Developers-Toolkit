@@ -27,7 +27,7 @@
     Downloads\pre-commit, and only then proceeds. It never
     overwrites a local copy that already exists. Download caveat:
     the default URLs point at hooks/pre-commit in
-    timothygwebb/Developers-Toolkit, which is not published yet
+    the Developers-Toolkit repository
     and that repo is still private, so unauthenticated raw
     download will return 404 today; if it fails, place the file
     in Downloads manually. A downloaded file is only accepted if

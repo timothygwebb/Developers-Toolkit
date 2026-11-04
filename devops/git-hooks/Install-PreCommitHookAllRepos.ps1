@@ -77,7 +77,7 @@
     by SHA256.
 
     Download caveat, stated plainly: the default download URLs
-    point at hooks/pre-commit in timothygwebb/Developers-Toolkit
+    point at hooks/pre-commit in the Developers-Toolkit repository
     (master first, then the toolkit/initial-package branch). That
     file is NOT in the toolkit repo yet, and that repo is still
     private, so an unauthenticated raw.githubusercontent.com
@@ -98,7 +98,7 @@
     Get-Item and Get-Content now use -Force for .git, and repo
     enumeration uses Get-ChildItem -Force, so hidden .git folders
     are handled. The four folders reported as "not a git repo"
-    (.venv, automation, roc1.Tests, speedup) really have no .git
+    (example-repo, another-repo) really have no .git
     and are still skipped.
 
     Future clones (added 2026-11-04): after the existing repos
