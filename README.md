@@ -17,7 +17,7 @@ The automation tools post one queued article per day to a WordPress.com site you
   Fully standalone — needs only Python 3 and a WordPress.com OAuth token.
   Also here: a universal Swagger/OpenAPI JSON to diagram converter
   (with a sample API) — it emits Mermaid, PlantUML, XMI, or editable Visio (.vsdx), and reads the spec from a file or a URL, so you can diagram an API
-  in free tools with no paid modeling product required.
+  in free tools with no paid modeling product required. The .vsdx output is validated: it opens as editable shapes, with no repair prompt.
 - **`devops/` (23 files) — Version control, CI/CD & machine diagnostics.** GitHub
   Actions smoke-test workflows, merged-branch cleanup, OneDrive/machine
   diagnostics, environment validators, a base64-corruption detector,
