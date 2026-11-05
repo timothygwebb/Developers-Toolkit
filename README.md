@@ -16,7 +16,7 @@ The automation tools post one queued article per day to a WordPress.com site you
   WordPress.com REST API. Includes the setup guide and an example config.
   Fully standalone — needs only Python 3 and a WordPress.com OAuth token.
   Also here: a universal Swagger/OpenAPI JSON to diagram converter
-  (with a sample API) — it emits Mermaid, PlantUML, or XMI, so you can diagram an API
+  (with a sample API) — it emits Mermaid, PlantUML, XMI, or editable Visio (.vsdx), and reads the spec from a file or a URL, so you can diagram an API
   in free tools with no paid modeling product required.
 - **`devops/` (23 files) — Version control, CI/CD & machine diagnostics.** GitHub
   Actions smoke-test workflows, merged-branch cleanup, OneDrive/machine
