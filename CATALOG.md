@@ -51,9 +51,18 @@ product component. Staged 2026-10-30.
 - `docs/TOPICS.md` — 30-day topic calendar template with generic example topics. Replace the examples with your own topics.
 - `docs/RATE_LIMITING_FIX.md` — Rate-limit and Playwright robustness patterns: pacing, retries, explicit waits, submit reliability.
 
+### tests/ (1 file)
+
+- `tests/test_convert_swagger_to_diagrams.py` — Pytest tests for the Swagger converter: spec parsing (OpenAPI 3 and Swagger 2), all four renderers, VSDX package validity, file and URL spec loading, and the CLI entrypoint.
+
+### .github/workflows/ (1 file)
+
+- `.github/workflows/tests.yml` — CI: runs the pytest suite on every push to master and every pull request.
+
 ## Notes on shipped files
 
 - `README.md` — toolkit overview, layers, and the patch-script safety pattern (written for this staging).
+- `pytest.ini` — Pytest configuration: testpaths = tests.
 - `LICENSE` — MIT license text.
 - `automation/SETUP.md` — setup guide for the WordPress poster (see automation/ entry above).
 
