@@ -10,7 +10,7 @@ product component. Staged 2026-10-30.
 - `automation/config.example.json` — Example config for the poster: site + draft/publish status (copy to config.json).
 - `automation/post_article.py` — Post the next queued article to a WordPress.com site configured in config.json via the WordPress.com REST API. Example site: your-site.wordpress.com.
 - `automation/SETUP.md` — Setup guide for the WordPress poster: queue format, token acquisition, daily scheduling, failure behavior. Use it like this: configure a site, queue articles, run once a day.
-- `automation/Convert-SwaggerToDiagrams.py` — Convert Swagger 2.0 / OpenAPI 3.x JSON to diagrams in free, open formats (Mermaid, PlantUML, XMI, editable Visio .vsdx; reads a file or a URL): schemas become classes, paths become interfaces grouped by tag.
+- `automation/Convert-SwaggerToDiagrams.py` — Convert Swagger 2.0 / OpenAPI 3.x JSON to diagrams in free, open formats (Mermaid, PlantUML, XMI, editable Visio .vsdx; reads a file or a URL): schemas become classes, paths become interfaces grouped by tag. Validated: the .vsdx opens as editable shapes.
 - `automation/Sample-Swagger.json` — Sample OpenAPI 3 spec (pet store) to test the converter.
 
 ### devops/ (15 files)
