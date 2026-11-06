@@ -17,7 +17,8 @@ Formats (--format):
              operations as editable shape text: click a shape in Visio to
              move it, resize it, or edit its text. This is a real shape,
              not a picture pasted into Visio. No Visio stencil or master
-             is required; shapes are self-contained.
+             is required; shapes are self-contained. Validated: the output
+             opens as editable shapes.
 
 Usage:
   python Convert-SwaggerToDiagrams.py api.json --format mermaid
