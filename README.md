@@ -42,6 +42,8 @@ check. The catalog describes each tool by the problem it resolves.
 Run the `.ps1` scripts from Windows PowerShell 5.1. All shipped `.ps1`
 files are pure ASCII, so they run cleanly under Windows PowerShell 5.1.
 
+Tests: run `python -m pytest -q` from the repo root; the same suite runs in CI on every push and pull request.
+
 ## What is NOT in here (on purpose)
 
 - Not a product. Nothing here is a full delivery; each item is a tool for
